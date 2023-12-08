@@ -1,63 +1,43 @@
+//
+// cc glfw-opengl-example.c glad.c -lglfw
+//
+#include "GLAD/glad.h" // https://glad.dav1d.de/
 #include <GLFW/glfw3.h>
-#include <stdlib.h>
 #include <stdio.h>
-#include <thread>
+#include <stdlib.h>
 
-static void error_callback(int error, const char* description)
-{
-    fputs(description, stderr);
-}
-static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
-{
-    if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
-        glfwSetWindowShouldClose(window, GL_TRUE);
-}
 
-static void run(GLFWwindow* window) {
-    while (!glfwWindowShouldClose(window))
-    {
-        float ratio;
-        int width, height;
-        glfwGetFramebufferSize(window, &width, &height);
-        ratio = width / (float) height;
-        glViewport(0, 0, width, height);
-        glClear(GL_COLOR_BUFFER_BIT);
-        glMatrixMode(GL_PROJECTION);
-        glLoadIdentity();
-        glOrtho(-ratio, ratio, -1.f, 1.f, 1.f, -1.f);
-        glMatrixMode(GL_MODELVIEW);
-        glLoadIdentity();
-        glRotatef((float) glfwGetTime() * 50.f, 0.f, 0.f, 1.f);
-        glBegin(GL_TRIANGLES);
-        glColor3f(1.f, 0.f, 0.f);
-        glVertex3f(-0.6f, -0.4f, 0.f);
-        glColor3f(0.f, 1.f, 0.f);
-        glVertex3f(0.6f, -0.4f, 0.f);
-        glColor3f(0.f, 0.f, 1.f);
-        glVertex3f(0.f, 0.6f, 0.f);
-        glEnd();
-        glfwSwapBuffers(window);
-        glfwPollEvents();
+static void keyHandler(GLFWwindow *window, int key, int scancode, int action, int mods) {
+
+    if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
+        glfwSetWindowShouldClose(window, GLFW_TRUE);
     }
+
 }
 
-int main(void)
-{
-    GLFWwindow* window;
-    glfwSetErrorCallback(error_callback);
-    if (!glfwInit())
-        exit(EXIT_FAILURE);
-    window = glfwCreateWindow(640, 480, "Simple example", NULL, NULL);
-    if (!window)
-    {
-        glfwTerminate();
-        exit(EXIT_FAILURE);
-    }
+
+int main() {
+
+    glfwInit();
+
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+    GLFWwindow *window = glfwCreateWindow(1280, 720, "GLFW OpenGL", NULL, NULL);
     glfwMakeContextCurrent(window);
-    glfwSetKeyCallback(window, key_callback);
-    std::thread gameThread(run, window);
-    gameThread.join();
+    gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
+
+    glfwSetKeyCallback(window, keyHandler);
+    while (!glfwWindowShouldClose(window)) {
+        glfwPollEvents();
+
+        glClearColor(0.3, 0.3, 0.3, 1.0);
+        glClear(GL_COLOR_BUFFER_BIT);
+        glfwSwapBuffers(window);
+    }
+
     glfwDestroyWindow(window);
     glfwTerminate();
-    exit(EXIT_SUCCESS);
+
 }
